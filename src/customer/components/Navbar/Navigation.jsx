@@ -44,11 +44,10 @@ export default function Navigation() {
   };
   const handleClose = () => {
     setOpenAuthModal(false);
-    navigate("/")
   };
 
   const handleCategoryClick = (category, section, item, close) => {
-    //navigate(`/${category.id}/${section.id}/${item.id}`);
+    navigate(`/${category.id}/${section.id}/${item.id}`);
     close();
   };
 

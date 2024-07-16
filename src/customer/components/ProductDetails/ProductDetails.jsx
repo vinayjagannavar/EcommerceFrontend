@@ -1,36 +1,18 @@
-/*
-  This example requires some changes to your config:
-  
-  ```
-  // tailwind.config.js
-  module.exports = {
-    // ...
-    theme: {
-      extend: {
-        gridTemplateRows: {
-          '[auto,auto,1fr]': 'auto auto 1fr',
-        },
-      },
-    },
-    plugins: [
-      // ...
-      require('@tailwindcss/aspect-ratio'),
-    ],
-  }
-  ```
-*/
-'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { StarIcon } from '@heroicons/react/20/solid'
 import { Radio, RadioGroup } from '@headlessui/react'
 import { Box, Button, Grid, LinearProgress, Rating } from "@mui/material";
 import ProductReviewCard from './ProductReviewCard';
 import { mens_kurta } from '../../../Data/Men/men_kurta';
 import HomeProductCard from '../Home/HomeProductCard';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { findProductsById } from '../../../State/Product/Action';
+import { store } from '../../../State/store';
+import { addItemToCart } from '../../../State/Cart/Action';
 
-const product = {
+const productItem = {
     name: 'Basic Tee 6-Pack',
     price: '$192',
     href: '#',
@@ -85,19 +67,30 @@ function classNames(...classes) {
 }
 
 export default function ProductDetails() {
-    const [selectedColor, setSelectedColor] = useState(product.colors[0])
-    const [selectedSize, setSelectedSize] = useState(product.sizes[2])
+    const [selectedSize, setSelectedSize] = useState()
     const navigate = useNavigate();
+    const params = useParams();
+    const dispatch = useDispatch();
+    const {product} = useSelector(store=>store)
+
     const handleAddToCart = () => {
+        const data = {productId:params.productId,size:selectedSize.name}
+        console.log("add item to cart", data)
+        dispatch(addItemToCart(data))
         navigate("/cart")
     }
+
+    useEffect(()=>{
+        const data ={productId:params.productId}
+        dispatch(findProductsById(data))
+    },[params.productId])
 
     return (
         <div className="bg-white lg:px-20">
             <div className="pt-6">
                 <nav aria-label="Breadcrumb">
                     <ol role="list" className="mx-auto flex max-w-2xl items-center space-x-2 px-4 sm:px-6 lg:max-w-7xl lg:px-8">
-                        {product.breadcrumbs.map((breadcrumb) => (
+                        {productItem.breadcrumbs.map((breadcrumb) => (
                             <li key={breadcrumb.id}>
                                 <div className="flex items-center">
                                     <a href={breadcrumb.href} className="mr-2 text-sm font-medium text-gray-900">
@@ -117,8 +110,8 @@ export default function ProductDetails() {
                             </li>
                         ))}
                         <li className="text-sm">
-                            <a href={product.href} aria-current="page" className="font-medium text-gray-500 hover:text-gray-600">
-                                {product.name}
+                            <a href={productItem.href} aria-current="page" className="font-medium text-gray-500 hover:text-gray-600">
+                                {productItem.name}
                             </a>
                         </li>
                     </ol>
@@ -128,13 +121,13 @@ export default function ProductDetails() {
                     <div className="flex flex-col items-center">
                         <div className="overflow-hidden rounded-lg max-w-[30rem] max-h-[35rem]">
                             <img
-                                alt={product.images[0].alt}
-                                src={product.images[0].src}
+                                alt={productItem.images[0].alt}
+                                src={product?.product?.imageUrl}
                                 className="h-full w-full object-cover object-center"
                             />
                         </div>
                         <div className="flex flex-wrap space-x-5 justify-center">
-                            {product.images.map((item) => <div className="aspect-h-2 aspect-w-3 overflow-hidden rounded-lg max-w-[5rem] max-h-[5rem] mt-4">
+                            {productItem.images.map((item) => <div className="aspect-h-2 aspect-w-3 overflow-hidden rounded-lg max-w-[5rem] max-h-[5rem] mt-4">
                                 <img
                                     alt={item.alt}
                                     src={item.src}
@@ -148,8 +141,8 @@ export default function ProductDetails() {
                     {/* Product info */}
                     <div className="lg:col-span-1 mx-auto max-w-2xl px-4 pb-16 sm:px-6  lg:max-w-7xl  lg:px-8 lg:pb-24">
                         <div className="lg:col-span-2">
-                            <h1 className="text-lg lg:text-xl font-semibold tracking-tight text-gray-900">UniversalOutfit</h1>
-                            <h1 className='text-lg lg:text-xl tracking-tight text-gray-900 opacity-60 pt-1'>Casual Puff Sleeves Solid Women White Top</h1>
+                            <h1 className="text-lg lg:text-xl font-semibold tracking-tight text-gray-900">{product?.product?.brand}</h1>
+                            <h1 className='text-lg lg:text-xl tracking-tight text-gray-900 opacity-60 pt-1'>{product?.product?.title}</h1>
                         </div>
 
                         {/* Options */}
@@ -157,13 +150,13 @@ export default function ProductDetails() {
                             <h2 className="sr-only">Product information</h2>
                             <div className='flex space-x-5 items-center text-lg lg:text-xl tracking-tight text-gray-900 mt-6'>
                                 <p className="font-semibold">
-                                    $20
+                                    ${product?.product?.discountedPrice}
                                 </p>
                                 <p className="opacity-50 line-through">
-                                    $20
+                                    ${product?.product?.price}
                                 </p>
                                 <p className="text-green-600 font-semibold">
-                                    10 %Off
+                                {product?.product?.discountPercent} %Off
                                 </p>
                             </div>
 
@@ -193,7 +186,7 @@ export default function ProductDetails() {
                                             onChange={setSelectedSize}
                                             className="grid grid-cols-4 gap-4 sm:grid-cols-8 lg:grid-cols-4"
                                         >
-                                            {product.sizes.map((size) => (
+                                            {productItem.sizes.map((size) => (
                                                 <Radio
                                                     key={size.name}
                                                     value={size}
@@ -247,7 +240,7 @@ export default function ProductDetails() {
                                 <h3 className="sr-only">Description</h3>
 
                                 <div className="space-y-6">
-                                    <p className="text-base text-gray-900">{product.description}</p>
+                                    <p className="text-base text-gray-900">{product?.product?.description}</p>
                                 </div>
                             </div>
 
@@ -256,7 +249,7 @@ export default function ProductDetails() {
 
                                 <div className="mt-4">
                                     <ul role="list" className="list-disc space-y-2 pl-4 text-sm">
-                                        {product.highlights.map((highlight) => (
+                                        {productItem.highlights.map((highlight) => (
                                             <li key={highlight} className="text-gray-400">
                                                 <span className="text-gray-600">{highlight}</span>
                                             </li>
@@ -269,7 +262,7 @@ export default function ProductDetails() {
                                 <h2 className="text-sm font-medium text-gray-900">Details</h2>
 
                                 <div className="mt-4 space-y-6">
-                                    <p className="text-sm text-gray-600">{product.details}</p>
+                                    <p className="text-sm text-gray-600">{productItem.details}</p>
                                 </div>
                             </div>
                         </div>
@@ -441,7 +434,7 @@ export default function ProductDetails() {
                     <h1 className="py-5 text-xl font-bold">Similer Products</h1>
                     <div className="flex flex-wrap space-y-5">
                         {mens_kurta.map((item) => (
-                            <HomeProductCard product={item} />
+                            <HomeProductCard productItem={item} />
                         ))}
                     </div>
                 </section>
