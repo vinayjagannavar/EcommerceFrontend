@@ -10,7 +10,11 @@ import {
 import { Avatar, Button, Menu, MenuItem } from "@mui/material";
 import { deepPurple } from "@mui/material/colors";
 import { navigation } from "../../../config/navigationMenu";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import AuthModal from "../../Auth/AuthModal";
+import { useDispatch, useSelector } from "react-redux";
+import { store } from "../../../State/store";
+import { getUser, logout } from "../../../State/Auth/Action";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -18,12 +22,15 @@ function classNames(...classes) {
 
 export default function Navigation() {
   const [open, setOpen] = useState(false);
-  
+
   const [openAuthModal, setOpenAuthModal] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const openUserMenu = Boolean(anchorEl);
   const jwt = localStorage.getItem("jwt");
   const navigate = useNavigate();
+  const { auth } = useSelector(store => store)
+  const dispatch = useDispatch();
+  const location = useLocation();
 
   const handleUserClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -37,7 +44,7 @@ export default function Navigation() {
   };
   const handleClose = () => {
     setOpenAuthModal(false);
-   
+    navigate("/")
   };
 
   const handleCategoryClick = (category, section, item, close) => {
@@ -45,6 +52,28 @@ export default function Navigation() {
     close();
   };
 
+  useEffect(() => {
+
+    if (jwt) {
+      dispatch(getUser(jwt))
+    }
+
+  }, [jwt, auth.jwt])
+
+  useEffect(() => {
+    if (auth.user){ 
+      handleClose();
+    }
+    if(location.pathname==="/login" || location.pathname==="/register"){
+      navigate(-1)
+    }
+  }, [auth.user]);
+
+  const handleLogout=()=>{
+    dispatch(logout())
+    handleCloseUserMenu()
+
+  }
 
   return (
     <div className="bg-white pb-10">
@@ -233,12 +262,12 @@ export default function Navigation() {
               {/* Logo */}
               <div className="ml-4 flex lg:ml-0">
 
-                  <span className="sr-only">Your Company</span>
-                  <img
-                    src="https://thumbs.dreamstime.com/b/shopping-bag-logo-design-icon-online-shop-symbol-vector-illustrations-discount-flat-sales-digital-commerce-store-simple-marketing-157881334.jpg"
-                    alt="Shopwithzosh"
-                    className="h-8 w-8 mr-2"
-                  />
+                <span className="sr-only">Your Company</span>
+                <img
+                  src="https://thumbs.dreamstime.com/b/shopping-bag-logo-design-icon-online-shop-symbol-vector-illustrations-discount-flat-sales-digital-commerce-store-simple-marketing-157881334.jpg"
+                  alt="Shopwithzosh"
+                  className="h-8 w-8 mr-2"
+                />
 
               </div>
 
@@ -376,7 +405,7 @@ export default function Navigation() {
 
               <div className="ml-auto flex items-center">
                 <div className="hidden lg:flex lg:flex-1 lg:items-center lg:justify-end lg:space-x-6">
-                  {true ? (
+                  {auth.user?.firstName ? (
                     <div>
                       <Avatar
                         className="text-white"
@@ -391,9 +420,9 @@ export default function Navigation() {
                           cursor: "pointer",
                         }}
                       >
-                        R
+                        {auth.user?.firstName[0].toUpperCase()}
                       </Avatar>
-                      
+
                       <Menu
                         id="basic-menu"
                         anchorEl={anchorEl}
@@ -406,7 +435,7 @@ export default function Navigation() {
                         <MenuItem onClick={() => navigate("/account/order")}>
                           My Orders
                         </MenuItem>
-                        <MenuItem >Logout</MenuItem>
+                        <MenuItem onClick={handleLogout}>Logout</MenuItem>
                       </Menu>
                     </div>
                   ) : (
@@ -450,6 +479,7 @@ export default function Navigation() {
           </div>
         </nav>
       </header>
+      <AuthModal handleClose={handleClose} open={openAuthModal} />
     </div>
   );
 }

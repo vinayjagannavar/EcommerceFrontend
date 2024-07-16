@@ -17,13 +17,16 @@ const CustomerRouters = () => {
         <Navigation />
       </div>
       <Routes>
-        <Route path='/' element={<Homepage/>}></Route>
-        <Route path='/cart' element={<Cart/>}></Route>
-        <Route path='/:levelOne/:levelTwo/:levelThree' element={<Product/>}></Route>
-        <Route path='/product/:productId' element={<ProductDetails/>}></Route>
-        <Route path='/checkout' element={<Checkout/>}></Route>
-        <Route path='/account/order' element={<Order/>}></Route>
-        <Route path='/account/order/:orderId' element={<OrderDetails/>}></Route>
+        <Route Route path='/login' element={<Homepage />}></Route>
+        <Route path='/register' element={<Homepage />}></Route>
+
+        <Route path='/' element={<Homepage />}></Route>
+        <Route path='/cart' element={<Cart />}></Route>
+        <Route path='/:levelOne/:levelTwo/:levelThree' element={<Product />}></Route>
+        <Route path='/product/:productId' element={<ProductDetails />}></Route>
+        <Route path='/checkout' element={<Checkout />}></Route>
+        <Route path='/account/order' element={<Order />}></Route>
+        <Route path='/account/order/:orderId' element={<OrderDetails />}></Route>
         {/* <Homepage/> */}
         {/* <Product/> */}
         {/* <ProductDetails/> */}
@@ -33,7 +36,7 @@ const CustomerRouters = () => {
         {/* <OrderDetails/> */}
       </Routes>
       <div>
-      <Footer/>
+        <Footer />
       </div>
     </div>
   )
