@@ -6,17 +6,19 @@ import { useDispatch, useSelector } from 'react-redux'
 import { getCart } from "../../../State/Cart/Action";
 import { store } from '../../../State/store'
 
+
 const Cart = () => {
     const navigate = useNavigate();
     const {cart} = useSelector(store=>store)
     const dispatch = useDispatch();
+    const jwt = localStorage.getItem("jwt");
     const handleCheckOut =() => {
         navigate("/checkout?step=2")
     }
 
     useEffect(()=>{
         dispatch(getCart())
-    },[])
+    },[cart.updateCartItem, cart.deleteCartItem])
     
     return (
         <div>

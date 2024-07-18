@@ -2,8 +2,21 @@ import { Button, IconButton } from '@mui/material'
 import React from 'react'
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
+import { useDispatch } from 'react-redux';
+import { removeCartItem, updateCartItem } from "../../../State/Cart/Action";
 
 const CartItem = ({item}) => {
+    const dispatch = useDispatch()
+
+    const handleUpdateCartItem=(num)=>{
+        const data={data:{quantity:item.quantity+num}, cartItemId:item?.id}
+        dispatch(updateCartItem(data))
+      }
+
+    const handleRemoveCartItem = () => {
+        dispatch(removeCartItem(item.id));
+      };
+
     return (
         <div className="p-5 shadow-lg border rounded-md">
             <div className="flex items-center">
@@ -24,7 +37,7 @@ const CartItem = ({item}) => {
                             ${item.discountedPrice}
                         </p>
                         <p className="text-green-600 font-semibold">
-                            {item.discountPercent}% off
+                            {item.product?.discountPercent}% off
                         </p>
                     </div>
                 </div>
@@ -34,19 +47,22 @@ const CartItem = ({item}) => {
 
             <div className="lg:flex items-center lg:space-x-10 pt-4">
                 <div className="flex items-center space-x-2 ">
-                    <IconButton color="primary" aria-label="add an alarm">
+                    {/* onClick={handleUpdateCartItem(-1)} */}
+                    <IconButton onClick={()=>handleUpdateCartItem(-1)} disabled={item.quantity<=1} color="primary" aria-label="add an alarm">
                         <RemoveCircleOutlineIcon />
                     </IconButton>
 
+                    {/* onClick={handleUpdateCartItem(1)} */}
                     <span className="py-1 px-7 border rounded-sm">{item.quantity}</span>
-                    <IconButton color="primary" aria-label="add an alarm">
+                    <IconButton  onClick={()=>handleUpdateCartItem(1)} color="primary" aria-label="add an alarm">
                         <AddCircleOutlineIcon />
                     </IconButton>
                 </div>
                 <div className="flex text-sm lg:text-base mt-5 lg:mt-0">
 
-                    <Button variant="text">
-                        Remove{" "}
+                {/* onClick={handleRemoveCartItem} */}
+                    <Button onClick={handleRemoveCartItem} variant="text">
+                        Remove
                     </Button>
 
                 </div>
