@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { getOrderById } from '../../../State/Order/Action'
 import { useLocation } from 'react-router-dom'
 import { store } from '../../../State/store'
+import { createPayment } from '../../../State/Payment/Action'
 
 const OrderSummary = () => {
     const dispatch = useDispatch()
@@ -19,6 +20,9 @@ const OrderSummary = () => {
         dispatch(getOrderById(orderId))
     },[orderId])
 
+    const handleCheckout=()=>{
+        dispatch(createPayment(orderId))
+    }
   return (
     <div className="space-y-5">
         <div className="p-5 shadow-lg rounded-md border ">
@@ -63,6 +67,7 @@ const OrderSummary = () => {
                         variant="contained"
                         type="submit"
                         sx={{ padding: ".8rem 2rem", marginTop: "2rem", width: "100%" }}
+                        onClick={handleCheckout}
                     >
                         Check Out
                     </Button>
