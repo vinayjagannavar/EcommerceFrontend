@@ -30,7 +30,7 @@ const LoginForm = () => {
                         <TextField required id='email' name='email' label='Email' fullWidth autoComplete='email' />
                     </Grid>
                     <Grid item xs={12}>
-                        <TextField required id='password' name='password' label='Password' fullWidth autoComplete='password' />
+                        <TextField required id='password' name='password' label='Password' fullWidth autoComplete='password' type='password'/>
                     </Grid>
                     <Grid item xs={12}>
                         <Button className='bg-[#9155FD] w-full'

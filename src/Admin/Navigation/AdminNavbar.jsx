@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { styled, alpha } from '@mui/material/styles';
+import { styled, alpha, useTheme } from '@mui/material/styles';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -17,7 +17,10 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 import MoreIcon from '@mui/icons-material/MoreVert';
 import Avatar from '@mui/material/Avatar';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import { useTheme } from '@mui/material/styles';
+import { useDispatch } from 'react-redux';
+import { logout } from '../../State/Auth/Action';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -49,7 +52,6 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   color: 'inherit',
   '& .MuiInputBase-input': {
     padding: theme.spacing(1, 1, 1, 0),
-    // vertical padding + font size from searchIcon
     paddingLeft: `calc(1em + ${theme.spacing(4)})`,
     transition: theme.transitions.create('width'),
     width: '100%',
@@ -59,9 +61,66 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-export default function AdminNavbar({handleSideBarViewInMobile}) {
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
+const renderMenu = (anchorEl, isMenuOpen, handleMenuClose, handleLogout) => (
+  <Menu
+    anchorEl={anchorEl}
+    anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+    id="primary-search-account-menu"
+    keepMounted
+    transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+    open={isMenuOpen}
+    onClose={handleMenuClose}
+  >
+    <MenuItem onClick={handleLogout}>Logout</MenuItem>
+  </Menu>
+);
+
+const renderMobileMenu = (mobileMoreAnchorEl, isMobileMenuOpen, handleMobileMenuClose, handleLogout) => (
+  <Menu
+    anchorEl={mobileMoreAnchorEl}
+    anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+    id="primary-search-account-menu-mobile"
+    keepMounted
+    transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+    open={isMobileMenuOpen}
+    onClose={handleMobileMenuClose}
+  >
+    <MenuItem>
+      <IconButton size="large" aria-label="show 4 new mails" color="inherit">
+        <Badge badgeContent={4} color="error">
+          <MailIcon />
+        </Badge>
+      </IconButton>
+      <p>Messages</p>
+    </MenuItem>
+    <MenuItem>
+      <IconButton size="large" aria-label="show 17 new notifications" color="inherit">
+        <Badge badgeContent={17} color="error">
+          <NotificationsIcon />
+        </Badge>
+      </IconButton>
+      <p>Notifications</p>
+    </MenuItem>
+    <MenuItem onClick={handleLogout}>
+      <IconButton
+        size="large"
+        aria-label="account of current user"
+        aria-controls="primary-search-account-menu"
+        aria-haspopup="true"
+        color="inherit"
+      >
+        <AccountCircle />
+      </IconButton>
+      <p>Logout</p>
+    </MenuItem>
+  </Menu>
+);
+
+export default function AdminNavbar({ handleSideBarViewInMobile }) {
+  const navigate = useNavigate();
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
+  
   const theme = useTheme();
   const isLargeScreen = useMediaQuery(theme.breakpoints.up('lg'));
 
@@ -85,103 +144,36 @@ export default function AdminNavbar({handleSideBarViewInMobile}) {
     setMobileMoreAnchorEl(event.currentTarget);
   };
 
-  const menuId = 'primary-search-account-menu';
-  const renderMenu = (
-    <Menu
-      anchorEl={anchorEl}
-      anchorOrigin={{
-        vertical: 'top',
-        horizontal: 'right',
-      }}
-      id={menuId}
-      keepMounted
-      transformOrigin={{
-        vertical: 'top',
-        horizontal: 'right',
-      }}
-      open={isMenuOpen}
-      onClose={handleMenuClose}
-    >
-      <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-      <MenuItem onClick={handleMenuClose}>My account</MenuItem>
-    </Menu>
-  );
-
-  const mobileMenuId = 'primary-search-account-menu-mobile';
-  const renderMobileMenu = (
-    <Menu
-      anchorEl={mobileMoreAnchorEl}
-      anchorOrigin={{
-        vertical: 'top',
-        horizontal: 'right',
-      }}
-      id={mobileMenuId}
-      keepMounted
-      transformOrigin={{
-        vertical: 'top',
-        horizontal: 'right',
-      }}
-      open={isMobileMenuOpen}
-      onClose={handleMobileMenuClose}
-    >
-      <MenuItem>
-        <IconButton size="large" aria-label="show 4 new mails" color="inherit">
-          <Badge badgeContent={4} color="error">
-            <MailIcon />
-          </Badge>
-        </IconButton>
-        <p>Messages</p>
-      </MenuItem>
-      <MenuItem>
-        <IconButton
-          size="large"
-          aria-label="show 17 new notifications"
-          color="inherit"
-        >
-          <Badge badgeContent={17} color="error">
-            <NotificationsIcon />
-          </Badge>
-        </IconButton>
-        <p>Notifications</p>
-      </MenuItem>
-      <MenuItem onClick={handleProfileMenuOpen}>
-        <IconButton
-          size="large"
-          aria-label="account of current user"
-          aria-controls="primary-search-account-menu"
-          aria-haspopup="true"
-          color="inherit"
-        >
-          <AccountCircle />
-        </IconButton>
-        <p>Profile</p>
-      </MenuItem>
-    </Menu>
-  );
+  const dispatch = useDispatch();
+  const handleLogout = () => {
+    dispatch(logout());
+    handleMobileMenuClose();
+    handleMenuClose();
+    navigate("/")
+  };
 
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + isLargeScreen, backgroundColor: 'rgb(0, 0, 22)' }}>
         <Toolbar>
-          {!isLargeScreen && <IconButton
-            size="large"
-            edge="start"
-            color="inherit"
-            aria-label="open drawer"
-            sx={{ mr: 2 }}
-            onClick={handleSideBarViewInMobile}
-          >
-            <MenuIcon />
-          </IconButton>}
+          {!isLargeScreen && (
+            <IconButton
+              size="large"
+              edge="start"
+              color="inherit"
+              aria-label="open drawer"
+              sx={{ mr: 2 }}
+              onClick={handleSideBarViewInMobile}
+            >
+              <MenuIcon />
+            </IconButton>
+          )}
           <Avatar alt="Cloth Crafters" src={`${process.env.PUBLIC_URL}/images/logo192.png`} />
           <Search>
             <SearchIconWrapper>
               <SearchIcon />
             </SearchIconWrapper>
-            <StyledInputBase
-              placeholder="Search…"
-              inputProps={{ 'aria-label': 'search' }}
-            />
+            <StyledInputBase placeholder="Search…" inputProps={{ 'aria-label': 'search' }} />
           </Search>
           <Box sx={{ flexGrow: 1 }} />
           <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
@@ -190,11 +182,7 @@ export default function AdminNavbar({handleSideBarViewInMobile}) {
                 <MailIcon />
               </Badge>
             </IconButton>
-            <IconButton
-              size="large"
-              aria-label="show 17 new notifications"
-              color="inherit"
-            >
+            <IconButton size="large" aria-label="show 17 new notifications" color="inherit">
               <Badge badgeContent={17} color="error">
                 <NotificationsIcon />
               </Badge>
@@ -203,7 +191,7 @@ export default function AdminNavbar({handleSideBarViewInMobile}) {
               size="large"
               edge="end"
               aria-label="account of current user"
-              aria-controls={menuId}
+              aria-controls="primary-search-account-menu"
               aria-haspopup="true"
               onClick={handleProfileMenuOpen}
               color="inherit"
@@ -212,20 +200,14 @@ export default function AdminNavbar({handleSideBarViewInMobile}) {
             </IconButton>
           </Box>
           <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
-            <IconButton
-              size="large"
-              aria-label="show more"
-              aria-controls={mobileMenuId}
-              aria-haspopup="true"
-              onClick={handleMobileMenuOpen}
-              color="inherit"
-            >
+            <IconButton size="large" aria-label="show more" aria-controls="primary-search-account-menu-mobile" aria-haspopup="true" onClick={handleMobileMenuOpen} color="inherit">
               <MoreIcon />
             </IconButton>
           </Box>
         </Toolbar>
       </AppBar>
-      
+      {renderMenu(anchorEl, isMenuOpen, handleMenuClose, handleLogout)}
+      {renderMobileMenu(mobileMoreAnchorEl, isMobileMenuOpen, handleMobileMenuClose, handleLogout)}
     </Box>
   );
 }

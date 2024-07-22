@@ -47,6 +47,7 @@ export default function Navigation() {
   };
 
   const handleCategoryClick = (category, section, item, close) => {
+    
     navigate(`/${category.id}/${section.id}/${item.id}`);
     close();
   };
@@ -64,7 +65,13 @@ export default function Navigation() {
       handleClose();
     }
     if(location.pathname==="/login" || location.pathname==="/register"){
-      navigate(-1)
+      if(auth.user.role==="ROLE_ADMIN"){
+        navigate("/admin")
+      }
+      else{
+        navigate("/")
+      }
+      
     }
   }, [auth.user]);
 
