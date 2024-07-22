@@ -34,7 +34,7 @@ const OrdersTable = () => {
 
   useEffect(()=>{
     dispatch(getOrders())
-  },[adminsOrder.delivered, adminsOrder.shipped, adminsOrder.confirmed])
+  },[adminsOrder.delivered, adminsOrder.shipped, adminsOrder.confirmed, adminsOrder.deletedOrder])
 
   const handleChange = (event) => {
     const name = event.target.name;
@@ -271,15 +271,6 @@ const OrdersTable = () => {
             </TableBody>
           </Table>
         </TableContainer>
-      </Card>
-      <Card className="mt-2 felx justify-center items-center">
-        <Pagination
-          className="py-5 w-auto"
-          size="large"
-          count={10}
-          color="primary"
-          onChange={handlePaginationChange}
-        />
       </Card>
     </Box>
   )

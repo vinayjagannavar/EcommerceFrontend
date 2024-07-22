@@ -7,7 +7,7 @@ import Typography from "@mui/material/Typography";
 import CardContent from "@mui/material/CardContent";
 
 // ** Icons Imports
-import DotsVertical from "mdi-material-ui/DotsVertical";
+import DotsVertical from '@mui/icons-material/MoreVert';
 
 const CardStatsVertical = (props) => {
   // ** Props
